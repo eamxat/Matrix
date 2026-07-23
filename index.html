@@ -201,8 +201,44 @@ const THEMES = {
     }
 };
 
+/**
+ * Almacenamiento seguro: xat suele cargar este archivo dentro de un
+ * <iframe sandbox>, y ese sandbox frecuentemente BLOQUEA localStorage.
+ * Si accedemos a localStorage sin protección y lanza una excepción,
+ * todo el script se detiene ahí (nunca se llega a initMatrix/animate),
+ * lo que explica que no se vea el efecto ni funcione el botón.
+ * Este wrapper prueba localStorage y, si falla, usa una variable en
+ * memoria como respaldo, sin interrumpir la ejecución.
+ */
+const safeStorage = (function () {
+    let memoryFallback = {};
+    let storageWorks = false;
+    try {
+        const testKey = '__xatmatrix_test__';
+        window.localStorage.setItem(testKey, '1');
+        window.localStorage.removeItem(testKey);
+        storageWorks = true;
+    } catch (e) {
+        storageWorks = false;
+    }
+    return {
+        get(key) {
+            if (storageWorks) {
+                try { return window.localStorage.getItem(key); } catch (e) { /* ignore */ }
+            }
+            return Object.prototype.hasOwnProperty.call(memoryFallback, key) ? memoryFallback[key] : null;
+        },
+        set(key, value) {
+            if (storageWorks) {
+                try { window.localStorage.setItem(key, value); return; } catch (e) { /* fall through */ }
+            }
+            memoryFallback[key] = value;
+        }
+    };
+})();
+
 const themeOrder = ['blue', 'green', 'yellow', 'purple'];
-let currentTheme = localStorage.getItem('matrixTheme') || 'blue';
+let currentTheme = safeStorage.get('matrixTheme') || 'blue';
 let activeColors = THEMES[currentTheme];
 
 function rotateTheme() {
@@ -213,7 +249,7 @@ function rotateTheme() {
 function setTheme(themeName) {
     currentTheme = themeName;
     activeColors = THEMES[themeName];
-    localStorage.setItem('matrixTheme', themeName);
+    safeStorage.set('matrixTheme', themeName);
 
     document.documentElement.style.setProperty('--bg-top', activeColors.bgTop);
     document.documentElement.style.setProperty('--bg-bottom', activeColors.bgBottom);
@@ -360,9 +396,13 @@ window.addEventListener('resize', () => {
     ctx.fillRect(0, 0, width, height);
 });
 
-initMatrix();
-setTheme(currentTheme);
-animate();
+try {
+    initMatrix();
+    setTheme(currentTheme);
+    animate();
+} catch (err) {
+    console.error('Xat Matrix: error al iniciar la animación ->', err);
+}
 
 // ==========================================
 // PROTECCIÓN CONTRA CLICK DERECHO Y F12
