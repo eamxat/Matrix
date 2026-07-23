@@ -69,12 +69,11 @@ canvas {
  * UI ADICIONAL (LOGO Y SWITCHER)
  * ========================================== */
 
-/* Logo SVG flotante inferior */
+/* Logo SVG flotante inferior izquierdo */
 .logo-link {
     position: fixed;
     bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 25px;
     z-index: 100;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: drop-shadow(0 0 10px var(--glow-color));
@@ -83,7 +82,7 @@ canvas {
 }
 
 .logo-link:hover {
-    transform: translateX(-50%) scale(1.1);
+    transform: scale(1.1);
     filter: drop-shadow(0 0 25px var(--glow-color));
     opacity: 1;
 }
@@ -96,7 +95,7 @@ canvas {
 /* Selector de Temas: Empujado hacia abajo por el padding superior */
 .theme-switcher {
     position: fixed;
-    top: calc(var(--header-padding) + 20px);
+    top: calc(var(--header-padding) + 19px);
     right: 25px;
     z-index: 101;
     display: flex;
@@ -105,8 +104,8 @@ canvas {
 }
 
 #theme-toggle-btn {
-    width: 32px;
-    height: 32px;
+    width: 29px;
+    height: 29px;
     border-radius: 50%;
     border: 2px solid rgba(255, 255, 255, 0.5);
     cursor: pointer;
@@ -157,7 +156,7 @@ canvas {
 
     <!-- Logo SVG con enlace -->
     <a href="https://xat.com" target="_blank" class="logo-link">
-        <img src="https://raw.githubusercontent.com/eamxat/Images/refs/heads/main/ablogo.svg" alt="xat logo">
+        <img src="https://raw.githubusercontent.com/eamxat/Images/4afc6514504cbe94483fef55564cf41a5c33aa86/xatlogo%20text2.svg" alt="xat logo">
     </a>
 
     <!-- Lienzo de renderizado Matrix -->
